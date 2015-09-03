@@ -1,0 +1,65 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function mqtt_menu() {
+
+  $items['admin/config/services/mqtt/settings'] = array(
+    'title' => 'Manage MQTT settings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('mqtt_settings_form'),
+    'access arguments' => array('administer site configuration'),
+  );
+
+  return $items;
+}
+
+
+/**
+ * Basic settings form.
+ */
+function mqtt_settings_form() {
+  $form = array();
+
+  $form['mqtt_host'] = array(
+    '#type' => 'textfield',
+    '#title' => t('MQTT Host'),
+    '#default_value' => variable_get('mqtt_host', 'test.mosquitto.org')
+  );
+
+  $form['mqtt_port'] = array(
+    '#type' => 'textfield',
+    '#title' => t('MQTT Host'),
+    '#default_value' => variable_get('mqtt_port', '1883')
+  );
+
+  $form['mqtt_client_name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('MQTT Host'),
+    '#default_value' => variable_get('mqtt_client_name', 'Drupal MQTT client name')
+  );
+
+  return system_settings_form($form);
+}
+
+
+/**
+ * Rules intgration.
+ */
+function mqtt_rules_event_info() {
+  $items = array(
+    'mqtt_subscribe' => array(
+      'label' => t('Subscribe to MQTT topics'),
+      'module' => t('MQTT'),
+      'variables' => array(
+        'mqtt_topic' => array(
+          'type' => 'text',
+          'label' => t('The MQTT message'),
+        ),
+      ),
+    ),
+  );
+
+  return $items;
+}

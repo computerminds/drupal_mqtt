@@ -1,0 +1,4 @@
+name = MQTT
+description = "Add basic MQTT integration to Drupal."
+core = 7.x
+configure = admin/config/services/mqtt/settings
