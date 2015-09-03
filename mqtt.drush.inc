@@ -24,14 +24,16 @@ function drush_mqtt_publish() {
   include_once(drupal_get_path('module', 'mqtt') . '/phpMQTT/phpMQTT.php');
 
   $mqtt = new phpMQTT(variable_get('mqtt_host', 'test.mosquitto.org'), variable_get('mqtt_port', '1883'), variable_get('mqtt_client_name', 'Drupal MQTT client name'));
+  $mqtt->debug=TRUE;
 
   if(!$mqtt->connect()){
     watchdog('MQTT', 'Failed to create MQTT connection');
+    echo 'Connection failed';
     exit;
   }
 
   // Hardcode the test message.
-  $mqtt->publish("your-topic/xxx","Testing message",0);
+  $mqtt->publish('yourtopic/xxx', 'Testing message', 0);
   $mqtt->close();
 }
 
@@ -44,6 +46,7 @@ function drush_mqtt_listen() {
   include_once(drupal_get_path('module', 'mqtt') . '/phpMQTT/phpMQTT.php');
 
   $mqtt = new phpMQTT(variable_get('mqtt_host', 'test.mosquitto.org'), variable_get('mqtt_port', '1883'), variable_get('mqtt_client_name', 'Drupal MQTT client name'));
+$mqtt->debug=TRUE;
 
   if(!$mqtt->connect()){
     watchdog('MQTT', 'Failed to create MQTT connection');
@@ -60,7 +63,7 @@ function drush_mqtt_listen() {
         foreach($rule->conditions() as $condition) {
           if ($condition->settings['data:select'] == 'mqtt-topic') {
             $topics[$condition->settings['value']] = array(
-              "qos" => 1,
+              "qos" => 0,
               "function" => "mqtt_handle_event"
             );
           }
