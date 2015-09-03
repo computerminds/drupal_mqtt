@@ -9,12 +9,35 @@ function mqtt_drush_command() {
     'aliases' => array('mqtt-l'),
   );
 
+  $items['mqtt-publish'] = array(
+    'description' => 'Publish an MQTT event.',
+    'aliases' => array('mqtt-p'),
+  );
+
   return $items;
+}
+
+/**
+ * Fire a test event.
+ */
+function drush_mqtt_publish() {
+  include_once(drupal_get_path('module', 'mqtt') . '/phpMQTT/phpMQTT.php');
+
+  $mqtt = new phpMQTT(variable_get('mqtt_host', 'test.mosquitto.org'), variable_get('mqtt_port', '1883'), variable_get('mqtt_client_name', 'Drupal MQTT client name'));
+
+  if(!$mqtt->connect()){
+    watchdog('MQTT', 'Failed to create MQTT connection');
+    exit;
+  }
+
+  // Hardcode the test message.
+  $mqtt->publish("your-topic/xxx","Testing message",0);
+  $mqtt->close();
 }
 
 
 /**
- * Callback for the drush-demo-command command
+ * Callback for the drush-demo-command command.
  */
 function drush_mqtt_listen() {
 
@@ -28,7 +51,6 @@ function drush_mqtt_listen() {
   }
 
   $topics = array();
-
   // Work out which topics we want to subscribe to.
   $rules = rules_config_load_multiple(FALSE);
   foreach($rules as $rule) {
@@ -38,7 +60,7 @@ function drush_mqtt_listen() {
         foreach($rule->conditions() as $condition) {
           if ($condition->settings['data:select'] == 'mqtt-topic') {
             $topics[$condition->settings['value']] = array(
-              "qos" => 0,
+              "qos" => 1,
               "function" => "mqtt_handle_event"
             );
           }
@@ -68,6 +90,6 @@ function drush_mqtt_listen() {
  */
 function mqtt_handle_event($topic, $msg) {
   // Based on the topic - fire the relevant events.
-  print 'DEBUG - firing event for ' . $topic;
+  print 'DEBUG - firing event for ' . $topic . "\n";
   rules_invoke_event('mqtt_subscribe', $topic);
 }
