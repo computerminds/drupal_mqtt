@@ -30,13 +30,13 @@ function mqtt_settings_form() {
 
   $form['mqtt_port'] = array(
     '#type' => 'textfield',
-    '#title' => t('MQTT Host'),
+    '#title' => t('MQTT Port'),
     '#default_value' => variable_get('mqtt_port', '1883')
   );
 
   $form['mqtt_client_name'] = array(
     '#type' => 'textfield',
-    '#title' => t('MQTT Host'),
+    '#title' => t('MQTT client name'),
     '#default_value' => variable_get('mqtt_client_name', 'Drupal MQTT client name')
   );
 
@@ -51,7 +51,7 @@ function mqtt_rules_event_info() {
   $items = array(
     'mqtt_subscribe' => array(
       'label' => t('Subscribe to MQTT topics'),
-      'module' => t('MQTT'),
+      'module' => t('mqtt'),
       'variables' => array(
         'mqtt_topic' => array(
           'type' => 'text',

@@ -23,7 +23,7 @@ function mqtt_drush_command() {
 function drush_mqtt_publish() {
   include_once(drupal_get_path('module', 'mqtt') . '/phpMQTT/phpMQTT.php');
 
-  $mqtt = new phpMQTT(variable_get('mqtt_host', 'test.mosquitto.org'), variable_get('mqtt_port', '1883'), variable_get('mqtt_client_name', 'Drupal MQTT client name'));
+  $mqtt = new phpMQTT(variable_get('mqtt_host', 'test.mosquitto.org'), variable_get('mqtt_port', '1883'), variable_get('mqtt_client_name', 'Drupal MQTT client name') . 'publish');
   $mqtt->debug=TRUE;
 
   if(!$mqtt->connect()){
@@ -33,7 +33,7 @@ function drush_mqtt_publish() {
   }
 
   // Hardcode the test message.
-  $mqtt->publish('yourtopic/xxx', 'Testing message', 0);
+  $mqtt->publish('/yourtopic/xxx', 'Testing message', 0);
   $mqtt->close();
 }
 
@@ -93,6 +93,8 @@ $mqtt->debug=TRUE;
  */
 function mqtt_handle_event($topic, $msg) {
   // Based on the topic - fire the relevant events.
-  print 'DEBUG - firing event for ' . $topic . "\n";
-  rules_invoke_event('mqtt_subscribe', $topic);
+  if (module_exists('rules')) {
+    print 'DEBUG - firing event for ' . $topic . "\n";
+    rules_invoke_event('mqtt_subscribe', $topic);
+  }
 }
